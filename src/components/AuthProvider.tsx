@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useNavigate } from 'react-router-dom';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { Profile } from '@/types/database';
@@ -30,9 +30,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
+  const navigate = useNavigate();
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string): Promise<Profile | null> => {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -84,12 +84,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
 
         // If user is signed in and the current route is / redirect the user to /dashboard
-        if (event === 'SIGNED_IN' && router.pathname === '/') {
-          router.push('/dashboard');
+        if (event === 'SIGNED_IN' && window.location.pathname === '/') {
+          navigate('/dashboard');
         }
         // If user is signed out and the current route is not / redirect the user to /
-        if (event === 'SIGNED_OUT' && router.pathname !== '/') {
-          router.push('/');
+        if (event === 'SIGNED_OUT' && window.location.pathname !== '/') {
+          navigate('/');
         }
       }
     );
@@ -97,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [router]);
+  }, [navigate]);
 
   const value = {
     user,
