@@ -9,8 +9,9 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Copy, Clipboard, Info } from "lucide-react";
+import { Copy, Info } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import TagBadge, { TagType } from './TagBadge';
 
 interface PromptDetailDialogProps {
@@ -46,7 +47,7 @@ const PromptDetailDialog: React.FC<PromptDetailDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold flex items-center gap-2">
             {prompt.title}
@@ -59,12 +60,14 @@ const PromptDetailDialog: React.FC<PromptDetailDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="mt-4">
-          <div className="bg-muted p-4 rounded-md">
-            <pre className="whitespace-pre-wrap text-sm font-mono break-words">
-              {prompt.content}
-            </pre>
-          </div>
+        <div className="mt-4 flex-1 overflow-hidden">
+          <ScrollArea className="h-[50vh]">
+            <div className="bg-muted p-4 rounded-md">
+              <pre className="whitespace-pre-wrap text-sm font-mono break-words">
+                {prompt.content}
+              </pre>
+            </div>
+          </ScrollArea>
           
           <div className="mt-4 flex items-start gap-2 text-sm text-muted-foreground">
             <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
