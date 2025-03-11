@@ -11,6 +11,8 @@ import {
   UserRound,
   LogOut,
   Menu,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import { cn } from '@/lib/utils';
@@ -43,20 +45,26 @@ export function Sidebar() {
 
   return (
     <div className="relative">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute -right-4 top-2 z-50 hidden md:flex"
-        onClick={() => setIsCollapsed(!isCollapsed)}
-      >
-        <Menu className="h-4 w-4" />
-      </Button>
-
       <aside className={cn(
-        "fixed left-0 top-0 z-40 flex h-screen flex-col border-r bg-background p-4 transition-all",
+        "fixed left-0 top-0 z-40 flex h-screen flex-col border-r bg-background transition-all",
         isCollapsed ? "w-16" : "w-64"
       )}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 p-4">
+          <div className="flex items-center justify-between mb-2">
+            {!isCollapsed && <div className="font-semibold">Promptly</div>}
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "h-8 w-8",
+                isCollapsed && "mx-auto"
+              )}
+              onClick={() => setIsCollapsed(!isCollapsed)}
+            >
+              {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </Button>
+          </div>
+
           <Button variant="ghost" className={cn(
             "justify-start gap-4",
             isCollapsed && "justify-center"
