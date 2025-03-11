@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
+import TagBadge, { TagType } from './TagBadge';
 
 interface CreatePromptDialogProps {
   onCreatePrompt: (prompt: { title: string; content: string; tag: string }) => void;
@@ -16,7 +17,7 @@ const CreatePromptDialog = ({ onCreatePrompt }: CreatePromptDialogProps) => {
   const [open, setOpen] = React.useState(false);
   const [title, setTitle] = React.useState("");
   const [content, setContent] = React.useState("");
-  const [tag, setTag] = React.useState("");
+  const [tag, setTag] = React.useState<TagType>("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +27,10 @@ const CreatePromptDialog = ({ onCreatePrompt }: CreatePromptDialogProps) => {
     setContent("");
     setTag("");
   };
+
+  const availableTags: TagType[] = [
+    'general', 'coding', 'writing', 'creative', 'learning', 'custom'
+  ];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -63,15 +68,18 @@ const CreatePromptDialog = ({ onCreatePrompt }: CreatePromptDialogProps) => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="tag">Tag</Label>
-            <Select value={tag} onValueChange={setTag} required>
+            <Select value={tag} onValueChange={setTag as any} required>
               <SelectTrigger>
                 <SelectValue placeholder="Select a tag" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="coding">Coding</SelectItem>
-                <SelectItem value="writing">Writing</SelectItem>
-                <SelectItem value="creative">Creative</SelectItem>
+                {availableTags.map((tagOption) => (
+                  <SelectItem key={tagOption} value={tagOption}>
+                    <div className="flex items-center">
+                      <TagBadge tag={tagOption} />
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

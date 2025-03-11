@@ -1,22 +1,25 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/components/AuthProvider';
 import PromptCard from '@/components/PromptCard';
 import CreatePromptDialog from '@/components/CreatePromptDialog';
+import TagFilter from '@/components/TagFilter';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
+import { TagType } from '@/components/TagBadge';
 
 interface Prompt {
   id: string;
   title: string;
   content: string;
-  tag: string;
+  tag: TagType;
   createdAt: Date;
 }
 
 const Index = () => {
-  const [prompts, setPrompts] = React.useState<Prompt[]>([]);
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [selectedTag, setSelectedTag] = useState<TagType | null>(null);
   const { user, signOut, isLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -31,11 +34,19 @@ const Index = () => {
       id: Math.random().toString(36).substr(2, 9),
       title,
       content,
-      tag,
+      tag: tag as TagType,
       createdAt: new Date(),
     };
     setPrompts((prev) => [newPrompt, ...prev]);
   };
+
+  const availableTags = Array.from(
+    new Set(prompts.map(prompt => prompt.tag))
+  ) as TagType[];
+
+  const filteredPrompts = selectedTag 
+    ? prompts.filter(prompt => prompt.tag === selectedTag)
+    : prompts;
 
   if (isLoading || !user) {
     return null;
@@ -57,13 +68,25 @@ const Index = () => {
           </div>
         </div>
         
-        {prompts.length === 0 ? (
+        {prompts.length > 0 && (
+          <TagFilter 
+            tags={availableTags} 
+            selectedTag={selectedTag} 
+            onSelectTag={setSelectedTag} 
+          />
+        )}
+        
+        {filteredPrompts.length === 0 ? (
           <div className="w-full text-center py-12">
-            <p className="text-muted-foreground">No prompts yet. Create your first prompt to get started!</p>
+            <p className="text-muted-foreground">
+              {prompts.length === 0 
+                ? "No prompts yet. Create your first prompt to get started!" 
+                : "No prompts match the selected filter."}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-            {prompts.map((prompt) => (
+            {filteredPrompts.map((prompt) => (
               <PromptCard
                 key={prompt.id}
                 title={prompt.title}

@@ -1,15 +1,15 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import TagBadge, { TagType } from './TagBadge';
 
 interface PromptCardProps {
   title: string;
   content: string;
-  tag: string;
+  tag: TagType;
   createdAt: Date;
 }
 
@@ -39,7 +39,7 @@ const PromptCard = ({ title, content, tag, createdAt }: PromptCardProps) => {
       </CardHeader>
       <CardContent>
         <div className="mb-4">
-          <Badge variant="secondary">{tag}</Badge>
+          <TagBadge tag={tag} />
         </div>
         <p className="text-sm text-muted-foreground whitespace-pre-wrap">{content}</p>
         <div className="mt-4 text-xs text-muted-foreground">
