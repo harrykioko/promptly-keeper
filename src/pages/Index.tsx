@@ -30,8 +30,16 @@ const Index = () => {
     handlePromptClick
   } = usePrompts(user?.id);
 
-  if (isLoading || !user) {
-    return null;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect in useEffect
   }
 
   const displayName = profile?.first_name || user.email?.split('@')[0] || 'there';

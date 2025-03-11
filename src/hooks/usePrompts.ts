@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { TagType } from '@/components/TagBadge';
 
-interface Prompt {
+export interface Prompt {
   id: string;
   title: string;
   content: string;
@@ -21,13 +21,16 @@ export const usePrompts = (userId: string | undefined) => {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   const { data: promptsData, isLoading: isLoadingPrompts } = useQuery({
-    queryKey: ['prompts'],
+    queryKey: ['prompts', userId],
     queryFn: async () => {
       if (!userId) return [];
+      
+      console.log('Fetching prompts for user ID:', userId);
       
       const { data, error } = await supabase
         .from('prompts')
         .select('*')
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
       
       if (error) {
@@ -39,6 +42,8 @@ export const usePrompts = (userId: string | undefined) => {
         });
         return [];
       }
+      
+      console.log('Prompts fetched:', data);
       
       return data.map(prompt => ({
         id: prompt.id,
@@ -54,6 +59,8 @@ export const usePrompts = (userId: string | undefined) => {
   const createPromptMutation = useMutation({
     mutationFn: async (newPrompt: { title: string; content: string; tag: string }) => {
       if (!userId) throw new Error('User not authenticated');
+      
+      console.log('Creating prompt for user ID:', userId);
       
       const { data, error } = await supabase
         .from('prompts')
@@ -75,7 +82,7 @@ export const usePrompts = (userId: string | undefined) => {
       return data[0];
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['prompts'] });
+      queryClient.invalidateQueries({ queryKey: ['prompts', userId] });
       toast({
         title: "Prompt created",
         description: "Your prompt has been saved successfully.",
@@ -111,5 +118,3 @@ export const usePrompts = (userId: string | undefined) => {
     handlePromptClick
   };
 };
-
-export type { Prompt };
