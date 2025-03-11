@@ -28,8 +28,8 @@ const NavItem = ({ icon: Icon, label, onClick, isCollapsed }: NavItemProps) => (
   <Button
     variant="ghost"
     className={cn(
-      "w-full justify-start gap-4 px-4",
-      isCollapsed && "justify-center px-2"
+      "w-full justify-start gap-2",
+      isCollapsed ? "justify-center px-2" : "px-3"
     )}
     onClick={onClick}
   >
@@ -49,8 +49,8 @@ export function Sidebar() {
         "fixed left-0 top-0 z-40 flex h-screen flex-col border-r bg-background transition-all",
         isCollapsed ? "w-16" : "w-64"
       )}>
-        <div className="flex flex-col gap-4 p-4">
-          <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-col gap-4 py-4 px-2">
+          <div className="flex items-center justify-between mb-2 px-1">
             {!isCollapsed && <div className="font-semibold">Promptly</div>}
             <Button
               variant="ghost"
@@ -65,10 +65,13 @@ export function Sidebar() {
             </Button>
           </div>
 
-          <Button variant="ghost" className={cn(
-            "justify-start gap-4",
-            isCollapsed && "justify-center"
-          )}>
+          <Button 
+            variant="ghost" 
+            className={cn(
+              "justify-start gap-2",
+              isCollapsed ? "justify-center px-2" : "px-3"
+            )}
+          >
             <Search className="h-5 w-5" />
             {!isCollapsed && <span>Search</span>}
           </Button>
