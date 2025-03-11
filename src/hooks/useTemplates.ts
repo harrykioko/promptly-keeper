@@ -117,17 +117,17 @@ export const useTemplates = (userId: string | undefined) => {
   });
 
   const createTemplateMutation = useMutation({
-    mutationFn: async (templateData: CreateTemplateInput) => {
+    mutationFn: async (templateInput: CreateTemplateInput) => {
       if (!userId) throw new Error('User not authenticated');
       
       // Create the template
-      const { data: templateData, error: templateError } = await supabase
+      const { data: newTemplate, error: templateError } = await supabase
         .from('templates')
         .insert([
           {
-            title: templateData.title,
-            description: templateData.description,
-            sequence: templateData.sequence,
+            title: templateInput.title,
+            description: templateInput.description,
+            sequence: templateInput.sequence,
             user_id: userId,
           }
         ])
@@ -138,10 +138,10 @@ export const useTemplates = (userId: string | undefined) => {
         throw templateError;
       }
       
-      const templateId = templateData[0].id;
+      const templateId = newTemplate[0].id;
       
       // Add template prompts
-      const templatePrompts = templateData.promptIds.map((promptId, index) => ({
+      const templatePrompts = templateInput.promptIds.map((promptId, index) => ({
         template_id: templateId,
         prompt_id: promptId,
         position: index + 1,
@@ -158,7 +158,7 @@ export const useTemplates = (userId: string | undefined) => {
         throw templatePromptsError;
       }
       
-      return templateData[0];
+      return newTemplate[0];
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['templates'] });
