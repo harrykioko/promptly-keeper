@@ -7,16 +7,19 @@ import { useToast } from "@/components/ui/use-toast";
 import TagBadge, { TagType } from './TagBadge';
 
 interface PromptCardProps {
+  id: string;
   title: string;
   content: string;
   tag: TagType;
   createdAt: Date;
+  onClick: () => void;
 }
 
-const PromptCard = ({ title, content, tag, createdAt }: PromptCardProps) => {
+const PromptCard = ({ id, title, content, tag, createdAt, onClick }: PromptCardProps) => {
   const { toast } = useToast();
 
-  const copyToClipboard = async () => {
+  const copyToClipboard = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent opening the dialog when clicking the copy button
     await navigator.clipboard.writeText(content);
     toast({
       title: "Copied to clipboard",
@@ -25,7 +28,7 @@ const PromptCard = ({ title, content, tag, createdAt }: PromptCardProps) => {
   };
 
   return (
-    <Card className="prompt-card">
+    <Card className="prompt-card cursor-pointer" onClick={onClick}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-xl font-semibold">{title}</CardTitle>
         <Button
@@ -41,7 +44,9 @@ const PromptCard = ({ title, content, tag, createdAt }: PromptCardProps) => {
         <div className="mb-4">
           <TagBadge tag={tag} />
         </div>
-        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{content}</p>
+        <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-3">
+          {content}
+        </p>
         <div className="mt-4 text-xs text-muted-foreground">
           Created: {createdAt.toLocaleDateString()}
         </div>

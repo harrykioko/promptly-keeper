@@ -5,6 +5,7 @@ import { useAuth } from '@/components/AuthProvider';
 import PromptCard from '@/components/PromptCard';
 import CreatePromptDialog from '@/components/CreatePromptDialog';
 import TagFilter from '@/components/TagFilter';
+import PromptDetailDialog from '@/components/PromptDetailDialog';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { TagType } from '@/components/TagBadge';
@@ -20,6 +21,8 @@ interface Prompt {
 const Index = () => {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [selectedTag, setSelectedTag] = useState<TagType | null>(null);
+  const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const { user, signOut, isLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -38,6 +41,11 @@ const Index = () => {
       createdAt: new Date(),
     };
     setPrompts((prev) => [newPrompt, ...prev]);
+  };
+
+  const handlePromptClick = (prompt: Prompt) => {
+    setSelectedPrompt(prompt);
+    setDetailDialogOpen(true);
   };
 
   const availableTags = Array.from(
@@ -89,15 +97,23 @@ const Index = () => {
             {filteredPrompts.map((prompt) => (
               <PromptCard
                 key={prompt.id}
+                id={prompt.id}
                 title={prompt.title}
                 content={prompt.content}
                 tag={prompt.tag}
                 createdAt={prompt.createdAt}
+                onClick={() => handlePromptClick(prompt)}
               />
             ))}
           </div>
         )}
       </div>
+
+      <PromptDetailDialog 
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        prompt={selectedPrompt}
+      />
     </div>
   );
 };
