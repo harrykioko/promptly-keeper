@@ -81,6 +81,36 @@ export interface Database {
           }
         ];
       };
+      profiles: {
+        Row: {
+          id: string;
+          created_at: string;
+          updated_at?: string;
+          first_name: string | null;
+          last_name: string | null;
+          avatar_url: string | null;
+          email: string;
+        };
+        Insert: {
+          id: string;
+          created_at?: string;
+          updated_at?: string;
+          first_name?: string | null;
+          last_name?: string | null;
+          avatar_url?: string | null;
+          email: string;
+        };
+        Update: {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+          first_name?: string | null;
+          last_name?: string | null;
+          avatar_url?: string | null;
+          email?: string;
+        };
+        Relationships: [];
+      };
       categories: {
         Row: {
           id: string;
@@ -508,6 +538,7 @@ export type DbResult<T> = T extends PromiseLike<infer U> ? U : never;
 export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }> ? Exclude<U, null> : never;
 
 export type Prompt = Tables<'prompts'>;
+export type Profile = Tables<'profiles'>;
 export type Category = Tables<'categories'>;
 export type PromptVersion = Tables<'prompt_versions'>;
 export type PromptUsage = Tables<'prompt_usage'>;
@@ -523,6 +554,7 @@ export type TemplateWithPrompts = Views<'templates_with_prompts'>;
 export type SecurePrompt = Views<'secure_prompts'>;
 
 export type NewPrompt = InsertTables<'prompts'>;
+export type NewProfile = InsertTables<'profiles'>;
 export type NewCategory = InsertTables<'categories'>;
 export type NewPromptVersion = InsertTables<'prompt_versions'>;
 export type NewPromptUsage = InsertTables<'prompt_usage'>;
@@ -534,6 +566,7 @@ export type NewTemplate = InsertTables<'templates'>;
 export type NewTemplatePrompt = InsertTables<'template_prompts'>;
 
 export type UpdatePrompt = UpdateTables<'prompts'>;
+export type UpdateProfile = UpdateTables<'profiles'>;
 export type UpdateCategory = UpdateTables<'categories'>;
 export type UpdatePromptVersion = UpdateTables<'prompt_versions'>;
 export type UpdatePromptUsage = UpdateTables<'prompt_usage'>;
