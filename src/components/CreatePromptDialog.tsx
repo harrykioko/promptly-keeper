@@ -18,11 +18,24 @@ const CreatePromptDialog = ({ onCreatePrompt }: CreatePromptDialogProps) => {
   const [title, setTitle] = React.useState("");
   const [content, setContent] = React.useState("");
   const [tag, setTag] = React.useState<TagType>("");
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onCreatePrompt({ title, content, tag });
-    setOpen(false);
+    setIsSubmitting(true);
+    
+    try {
+      await onCreatePrompt({ title, content, tag });
+      setOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error("Error creating prompt:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
     setTitle("");
     setContent("");
     setTag("");
@@ -33,7 +46,10 @@ const CreatePromptDialog = ({ onCreatePrompt }: CreatePromptDialogProps) => {
   ];
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      setOpen(newOpen);
+      if (!newOpen) resetForm();
+    }}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
@@ -83,7 +99,9 @@ const CreatePromptDialog = ({ onCreatePrompt }: CreatePromptDialogProps) => {
               </SelectContent>
             </Select>
           </div>
-          <Button type="submit" className="w-full">Create Prompt</Button>
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Creating..." : "Create Prompt"}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>
