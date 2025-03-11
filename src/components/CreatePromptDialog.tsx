@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
 import TagBadge, { TagType } from './TagBadge';
+import { useToast } from "@/components/ui/use-toast";
 
 interface CreatePromptDialogProps {
   onCreatePrompt: (prompt: { title: string; content: string; tag: string }) => void;
@@ -19,12 +20,24 @@ const CreatePromptDialog = ({ onCreatePrompt }: CreatePromptDialogProps) => {
   const [content, setContent] = React.useState("");
   const [tag, setTag] = React.useState<TagType>("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!title || !content || !tag) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
+      console.log('Submitting prompt form with data:', { title, content, tag });
       await onCreatePrompt({ title, content, tag });
       setOpen(false);
       resetForm();

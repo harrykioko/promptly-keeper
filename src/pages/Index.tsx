@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/components/AuthProvider';
@@ -6,14 +7,19 @@ import TagFilter from '@/components/TagFilter';
 import PromptHeader from '@/components/PromptHeader';
 import PromptList from '@/components/PromptList';
 import { usePrompts } from '@/hooks/usePrompts';
+import { useToast } from '@/components/ui/use-toast';
 
 const Index = () => {
   const { user, profile, signOut, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!isLoading && !user) {
+      console.log('No user found, redirecting to auth page');
       navigate('/auth');
+    } else if (user) {
+      console.log('User authenticated:', user.id);
     }
   }, [isLoading, user, navigate]);
 
@@ -28,6 +34,10 @@ const Index = () => {
     handleCreatePrompt,
     handlePromptClick
   } = usePrompts(user?.id);
+
+  useEffect(() => {
+    console.log('Prompts in Index component:', prompts);
+  }, [prompts]);
 
   if (isLoading) {
     return (
@@ -47,13 +57,22 @@ const Index = () => {
     new Set(prompts.map(prompt => prompt.tag))
   );
 
+  const handlePromptCreate = (prompt: { title: string; content: string; tag: string }) => {
+    console.log('Creating prompt:', prompt);
+    handleCreatePrompt(prompt);
+    toast({
+      title: "Creating prompt",
+      description: "Your prompt is being created...",
+    });
+  };
+
   return (
     <div className="container px-4 py-8 mx-auto fade-in">
       <div className="flex flex-col items-start gap-6">
         <PromptHeader 
           displayName={displayName}
           onSignOut={signOut}
-          onCreatePrompt={handleCreatePrompt}
+          onCreatePrompt={handlePromptCreate}
         />
         
         {prompts.length > 0 && (

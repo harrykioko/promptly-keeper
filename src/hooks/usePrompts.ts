@@ -25,6 +25,8 @@ export const usePrompts = (userId: string | undefined) => {
     queryFn: async () => {
       if (!userId) return [];
       
+      console.log('Fetching prompts for user ID:', userId);
+      
       const { data, error } = await supabase
         .from('prompts')
         .select('*')
@@ -41,6 +43,8 @@ export const usePrompts = (userId: string | undefined) => {
         return [];
       }
       
+      console.log('Prompts fetched:', data);
+      
       return data.map(prompt => ({
         id: prompt.id,
         title: prompt.title,
@@ -56,6 +60,8 @@ export const usePrompts = (userId: string | undefined) => {
     mutationFn: async (newPrompt: { title: string; content: string; tag: string }) => {
       if (!userId) throw new Error('User not authenticated');
       
+      console.log('Creating prompt for user ID:', userId, 'Prompt:', newPrompt);
+      
       const { data, error } = await supabase
         .from('prompts')
         .insert([
@@ -69,7 +75,12 @@ export const usePrompts = (userId: string | undefined) => {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating prompt:', error);
+        throw error;
+      }
+      
+      console.log('Prompt created:', data);
       return data;
     },
     onSuccess: () => {
