@@ -20,12 +20,10 @@ export const usePrompts = (userId: string | undefined) => {
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
-  const { data: promptsData, isLoading: isLoadingPrompts } = useQuery({
+  const { data: prompts = [], isLoading: isLoadingPrompts } = useQuery({
     queryKey: ['prompts', userId],
     queryFn: async () => {
       if (!userId) return [];
-      
-      console.log('Fetching prompts for user ID:', userId);
       
       const { data, error } = await supabase
         .from('prompts')
@@ -43,15 +41,13 @@ export const usePrompts = (userId: string | undefined) => {
         return [];
       }
       
-      console.log('Prompts fetched:', data);
-      
       return data.map(prompt => ({
         id: prompt.id,
         title: prompt.title,
         content: prompt.content,
         tag: prompt.tag as TagType,
         createdAt: new Date(prompt.created_at),
-      }));
+      })) as Prompt[];
     },
     enabled: !!userId,
   });
@@ -59,8 +55,6 @@ export const usePrompts = (userId: string | undefined) => {
   const createPromptMutation = useMutation({
     mutationFn: async (newPrompt: { title: string; content: string; tag: string }) => {
       if (!userId) throw new Error('User not authenticated');
-      
-      console.log('Creating prompt for user ID:', userId);
       
       const { data, error } = await supabase
         .from('prompts')
@@ -72,25 +66,22 @@ export const usePrompts = (userId: string | undefined) => {
             user_id: userId,
           }
         ])
-        .select();
+        .select()
+        .single();
       
-      if (error) {
-        console.error('Error creating prompt:', error);
-        throw error;
-      }
-      
-      return data[0];
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['prompts', userId] });
       toast({
-        title: "Prompt created",
+        title: "Success",
         description: "Your prompt has been saved successfully.",
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
-        title: "Error creating prompt",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -107,7 +98,7 @@ export const usePrompts = (userId: string | undefined) => {
   };
 
   return {
-    prompts: promptsData || [],
+    prompts,
     isLoadingPrompts,
     selectedTag,
     setSelectedTag,

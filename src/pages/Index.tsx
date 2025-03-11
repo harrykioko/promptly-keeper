@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/components/AuthProvider';
@@ -73,11 +72,13 @@ const Index = () => {
         />
       </div>
 
-      <PromptDetailDialog 
-        open={detailDialogOpen}
-        onOpenChange={setDetailDialogOpen}
-        prompt={selectedPrompt}
-      />
+      {selectedPrompt && (
+        <PromptDetailDialog 
+          open={detailDialogOpen}
+          onOpenChange={setDetailDialogOpen}
+          prompt={selectedPrompt}
+        />
+      )}
     </div>
   );
 };
