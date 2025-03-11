@@ -1,15 +1,12 @@
-
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
 import { Prompt } from '@/hooks/usePrompts';
+import { Template as DbTemplate, NewTemplate, TemplateWithPrompts, NewTemplatePrompt } from '@/types/database';
 
-export interface Template {
-  id: string;
-  title: string;
-  description: string | null;
-  sequence: boolean;
+// Extended Template interface that includes UI-specific properties
+export interface Template extends Omit<DbTemplate, 'created_at'> {
   createdAt: Date;
   prompts: Prompt[];
 }
@@ -28,14 +25,15 @@ export const useTemplates = (userId: string | undefined) => {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   const { data: templatesData, isLoading: isLoadingTemplates } = useQuery({
-    queryKey: ['templates'],
+    queryKey: ['templates', userId],
     queryFn: async () => {
       if (!userId) return [];
       
-      const { data: templatesData, error: templatesError } = await supabase
-        .from('templates')
+      // Use the templates_with_prompts view for better performance
+      const { data: templatesWithPromptsData, error: templatesError } = await supabase
+        .from('templates_with_prompts')
         .select('*')
-        .order('created_at', { ascending: false });
+        .eq('user_id', userId);
       
       if (templatesError) {
         console.error('Error fetching templates:', templatesError);
@@ -47,71 +45,45 @@ export const useTemplates = (userId: string | undefined) => {
         return [];
       }
 
-      const templates = [];
+      // Process the results to group prompts by template
+      const templatesMap = new Map<string, Template>();
       
-      for (const template of templatesData) {
-        // Get the prompts for each template
-        const { data: templatePromptsData, error: templatePromptsError } = await supabase
-          .from('template_prompts')
-          .select('prompt_id, position')
-          .eq('template_id', template.id)
-          .order('position', { ascending: true });
-          
-        if (templatePromptsError) {
-          console.error('Error fetching template prompts:', templatePromptsError);
-          continue;
-        }
-        
-        if (templatePromptsData.length === 0) {
-          templates.push({
-            id: template.id,
-            title: template.title,
-            description: template.description,
-            sequence: template.sequence,
-            createdAt: new Date(template.created_at),
-            prompts: [],
+      templatesWithPromptsData.forEach((row: TemplateWithPrompts) => {
+        if (!templatesMap.has(row.template_id)) {
+          templatesMap.set(row.template_id, {
+            id: row.template_id,
+            title: row.template_title,
+            description: row.template_description,
+            sequence: row.sequence,
+            createdAt: new Date(row.template_created_at),
+            user_id: row.user_id,
+            prompts: []
           });
-          continue;
         }
         
-        const promptIds = templatePromptsData.map(tp => tp.prompt_id);
-        
-        const { data: promptsData, error: promptsError } = await supabase
-          .from('prompts')
-          .select('*')
-          .in('id', promptIds);
-          
-        if (promptsError) {
-          console.error('Error fetching prompts for template:', promptsError);
-          continue;
+        if (row.prompt_id) {
+          templatesMap.get(row.template_id)!.prompts.push({
+            id: row.prompt_id,
+            title: row.prompt_title || '',
+            content: row.prompt_content || '',
+            tag: row.prompt_tag || 'general',
+            tags: [], // We don't have tags in this view, would need another query if needed
+            createdAt: new Date(row.prompt_created_at || ''),
+            position: row.position || 0,
+            user_id: row.user_id,
+            is_public: false,
+            category_id: null,
+            version: 1,
+            is_favorite: false,
+            usage_count: 0,
+            created_at: row.prompt_created_at || '',
+            updated_at: '',
+            last_used_at: null
+          });
         }
-        
-        // Map the prompts to their positions
-        const positionedPrompts = templatePromptsData.map(tp => {
-          const prompt = promptsData.find(p => p.id === tp.prompt_id);
-          if (!prompt) return null;
-          
-          return {
-            id: prompt.id,
-            title: prompt.title,
-            content: prompt.content,
-            tag: prompt.tag,
-            createdAt: new Date(prompt.created_at),
-            position: tp.position,
-          };
-        }).filter(Boolean).sort((a, b) => a.position - b.position);
-        
-        templates.push({
-          id: template.id,
-          title: template.title,
-          description: template.description,
-          sequence: template.sequence,
-          createdAt: new Date(template.created_at),
-          prompts: positionedPrompts,
-        });
-      }
+      });
       
-      return templates;
+      return Array.from(templatesMap.values());
     },
     enabled: !!userId,
   });
@@ -121,16 +93,16 @@ export const useTemplates = (userId: string | undefined) => {
       if (!userId) throw new Error('User not authenticated');
       
       // Create the template
+      const templateData: NewTemplate = {
+        title: templateInput.title,
+        description: templateInput.description,
+        sequence: templateInput.sequence,
+        user_id: userId,
+      };
+      
       const { data: newTemplate, error: templateError } = await supabase
         .from('templates')
-        .insert([
-          {
-            title: templateInput.title,
-            description: templateInput.description,
-            sequence: templateInput.sequence,
-            user_id: userId,
-          }
-        ])
+        .insert(templateData)
         .select();
       
       if (templateError) {
@@ -141,7 +113,7 @@ export const useTemplates = (userId: string | undefined) => {
       const templateId = newTemplate[0].id;
       
       // Add template prompts
-      const templatePrompts = templateInput.promptIds.map((promptId, index) => ({
+      const templatePrompts: NewTemplatePrompt[] = templateInput.promptIds.map((promptId, index) => ({
         template_id: templateId,
         prompt_id: promptId,
         position: index + 1,
@@ -161,7 +133,7 @@ export const useTemplates = (userId: string | undefined) => {
       return newTemplate[0];
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['templates'] });
+      queryClient.invalidateQueries({ queryKey: ['templates', userId] });
       toast({
         title: "Template created",
         description: "Your template has been saved successfully.",
@@ -176,8 +148,40 @@ export const useTemplates = (userId: string | undefined) => {
     },
   });
 
+  const deleteTemplateMutation = useMutation({
+    mutationFn: async (templateId: string) => {
+      // With CASCADE delete, we only need to delete the template
+      const { error } = await supabase.from('templates').delete().eq('id', templateId);
+      
+      if (error) {
+        console.error('Error deleting template:', error);
+        throw error;
+      }
+      
+      return templateId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['templates', userId] });
+      toast({
+        title: "Template deleted",
+        description: "Your template has been deleted successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error deleting template",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleCreateTemplate = (template: CreateTemplateInput) => {
     createTemplateMutation.mutate(template);
+  };
+
+  const handleDeleteTemplate = (templateId: string) => {
+    deleteTemplateMutation.mutate(templateId);
   };
 
   const handleTemplateClick = (template: Template) => {
@@ -192,6 +196,7 @@ export const useTemplates = (userId: string | undefined) => {
     detailDialogOpen,
     setDetailDialogOpen,
     handleCreateTemplate,
+    handleDeleteTemplate,
     handleTemplateClick
   };
 };

@@ -1,11 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '../types/database';
+import { Database, TypedSupabaseClient } from '../types/database';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 // Create a single supabase client for interacting with your database
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey) as TypedSupabaseClient;
 
 // Helper functions for common database operations
 
@@ -203,4 +203,121 @@ export const getPromptUsageHistory = async (promptId: string) => {
     .select('*')
     .eq('prompt_id', promptId)
     .order('created_at', { ascending: false });
+};
+
+// Tags
+export const getTags = async () => {
+  return supabase
+    .from('tags')
+    .select('*')
+    .order('name');
+};
+
+export const createTag = async (name: string) => {
+  return supabase.from('tags').insert({ name });
+};
+
+// Prompt Tags
+export const getPromptTags = async (promptId: string) => {
+  return supabase
+    .from('prompt_tags')
+    .select(`
+      *,
+      tags:tag_id(*)
+    `)
+    .eq('prompt_id', promptId);
+};
+
+export const addTagToPrompt = async (promptId: string, tagId: string) => {
+  return supabase.from('prompt_tags').insert({
+    prompt_id: promptId,
+    tag_id: tagId
+  });
+};
+
+export const removeTagFromPrompt = async (promptId: string, tagId: string) => {
+  return supabase
+    .from('prompt_tags')
+    .delete()
+    .eq('prompt_id', promptId)
+    .eq('tag_id', tagId);
+};
+
+// Templates
+export const getTemplates = async (userId: string) => {
+  return supabase
+    .from('templates_with_prompts')
+    .select('*')
+    .eq('user_id', userId);
+};
+
+export const getTemplateById = async (id: string) => {
+  return supabase
+    .from('templates_with_prompts')
+    .select('*')
+    .eq('template_id', id);
+};
+
+export const createTemplate = async (template: {
+  title: string;
+  description: string | null;
+  sequence: boolean;
+  user_id: string;
+}) => {
+  return supabase.from('templates').insert(template);
+};
+
+export const updateTemplate = async (
+  id: string,
+  updates: {
+    title?: string;
+    description?: string | null;
+    sequence?: boolean;
+  }
+) => {
+  return supabase
+    .from('templates')
+    .update(updates)
+    .eq('id', id);
+};
+
+export const deleteTemplate = async (id: string) => {
+  return supabase
+    .from('templates')
+    .delete()
+    .eq('id', id);
+};
+
+// Template Prompts
+export const addPromptToTemplate = async (
+  templateId: string,
+  promptId: string,
+  position: number
+) => {
+  return supabase.from('template_prompts').insert({
+    template_id: templateId,
+    prompt_id: promptId,
+    position
+  });
+};
+
+export const updatePromptPosition = async (
+  id: string,
+  position: number
+) => {
+  return supabase
+    .from('template_prompts')
+    .update({ position })
+    .eq('id', id);
+};
+
+export const removePromptFromTemplate = async (
+  templateId: string,
+  promptId: string
+) => {
+  return supabase
+    .from('template_prompts')
+    .delete()
+    .eq('template_id', templateId)
+    .eq('prompt_id', promptId);
 }; 
