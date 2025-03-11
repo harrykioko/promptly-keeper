@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/components/AuthProvider';
@@ -25,7 +24,7 @@ const Index = () => {
   const [selectedTag, setSelectedTag] = useState<TagType | null>(null);
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  const { user, signOut, isLoading } = useAuth();
+  const { user, profile, signOut, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -36,7 +35,6 @@ const Index = () => {
     }
   }, [isLoading, user, navigate]);
 
-  // Query to fetch prompts from Supabase
   const { data: promptsData, isLoading: isLoadingPrompts } = useQuery({
     queryKey: ['prompts'],
     queryFn: async () => {
@@ -68,7 +66,6 @@ const Index = () => {
     enabled: !!user,
   });
 
-  // Mutation to create a new prompt
   const createPromptMutation = useMutation({
     mutationFn: async (newPrompt: { title: string; content: string; tag: string }) => {
       if (!user) throw new Error('User not authenticated');
@@ -131,13 +128,15 @@ const Index = () => {
     return null;
   }
 
+  const displayName = profile?.first_name || user.email?.split('@')[0] || 'there';
+
   return (
     <div className="container px-4 py-8 mx-auto fade-in">
       <div className="flex flex-col items-start gap-6">
         <div className="flex items-center justify-between w-full">
           <div>
             <h1 className="text-4xl font-bold">Promptly</h1>
-            <p className="text-muted-foreground">Welcome, {user.email}</p>
+            <p className="text-muted-foreground">Welcome, {displayName}</p>
           </div>
           <div className="flex items-center gap-4">
             <CreatePromptDialog onCreatePrompt={handleCreatePrompt} />
