@@ -1,4 +1,3 @@
-
 import React from 'react';
 import PromptCard from '@/components/PromptCard';
 import { TagType } from '@/components/TagBadge';
@@ -16,18 +15,16 @@ interface PromptListProps {
   selectedTag: TagType | null;
   onPromptClick: (prompt: Prompt) => void;
   isLoading: boolean;
+  searchQuery?: string;
 }
 
-const PromptList: React.FC<PromptListProps> = ({ 
+const PromptList = ({ 
   prompts, 
   selectedTag, 
   onPromptClick, 
-  isLoading 
-}) => {
-  const filteredPrompts = selectedTag 
-    ? prompts.filter(prompt => prompt.tag === selectedTag)
-    : prompts;
-
+  isLoading,
+  searchQuery = ''
+}: PromptListProps) => {
   if (isLoading) {
     return (
       <div className="w-full text-center py-12">
@@ -36,13 +33,15 @@ const PromptList: React.FC<PromptListProps> = ({
     );
   }
 
-  if (filteredPrompts.length === 0) {
+  if (prompts.length === 0) {
     return (
       <div className="w-full text-center py-12">
         <p className="text-muted-foreground">
-          {prompts.length === 0 
-            ? "No prompts yet. Create your first prompt to get started!" 
-            : "No prompts match the selected filter."}
+          {searchQuery 
+            ? `No prompts match "${searchQuery}"${selectedTag !== 'all' ? ` with tag "${selectedTag}"` : ''}.` 
+            : prompts.length === 0 
+              ? "No prompts yet. Create your first prompt to get started!" 
+              : "No prompts match the selected filter."}
         </p>
       </div>
     );
@@ -50,7 +49,7 @@ const PromptList: React.FC<PromptListProps> = ({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-      {filteredPrompts.map((prompt) => (
+      {prompts.map((prompt) => (
         <PromptCard
           key={prompt.id}
           id={prompt.id}
@@ -59,6 +58,7 @@ const PromptList: React.FC<PromptListProps> = ({
           tag={prompt.tag}
           createdAt={prompt.createdAt}
           onClick={() => onPromptClick(prompt)}
+          searchQuery={searchQuery}
         />
       ))}
     </div>

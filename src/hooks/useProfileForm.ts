@@ -1,22 +1,17 @@
-
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 import { useToast } from "@/components/ui/use-toast";
-import { User } from '@supabase/supabase-js';
+import { User as SupabaseUser } from '@supabase/supabase-js';
+import { Profile } from '@/types/database';
 
-export interface Profile {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  avatar_url: string | null;
-}
-
-export const useProfileForm = (user: User, onProfileUpdate?: (profile: Profile) => void) => {
+export const useProfileForm = (user: SupabaseUser, onProfileUpdate?: (profile: Profile) => void) => {
   const [profile, setProfile] = useState<Profile>({
     id: user.id,
+    created_at: new Date().toISOString(),
     first_name: '',
     last_name: '',
     avatar_url: null,
+    email: user.email || '',
   });
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -44,12 +39,7 @@ export const useProfileForm = (user: User, onProfileUpdate?: (profile: Profile) 
         }
 
         if (data) {
-          setProfile({
-            id: data.id,
-            first_name: data.first_name,
-            last_name: data.last_name,
-            avatar_url: data.avatar_url,
-          });
+          setProfile(data as Profile);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
