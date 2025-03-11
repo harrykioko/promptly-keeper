@@ -9,7 +9,96 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      prompts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          tag: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          tag: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          tag?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      template_prompts: {
+        Row: {
+          id: string
+          position: number
+          prompt_id: string
+          template_id: string
+        }
+        Insert: {
+          id?: string
+          position: number
+          prompt_id: string
+          template_id: string
+        }
+        Update: {
+          id?: string
+          position?: number
+          prompt_id?: string
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_prompts_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_prompts_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          sequence: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          sequence?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          sequence?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
