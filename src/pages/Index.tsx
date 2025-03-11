@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/components/AuthProvider';
 import PromptDetailDialog from '@/components/PromptDetailDialog';
 import TagFilter from '@/components/TagFilter';
 import PromptHeader from '@/components/PromptHeader';
 import PromptList from '@/components/PromptList';
+import SearchBar from '@/components/SearchBar';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -12,6 +13,7 @@ const Index = () => {
   const { user, profile, signOut, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -65,6 +67,17 @@ const Index = () => {
     });
   };
 
+  // Filter prompts based on search query and selected tag
+  const filteredPrompts = prompts.filter(prompt => {
+    const matchesSearch = searchQuery === '' || 
+      prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      prompt.content.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesTag = selectedTag === 'all' || prompt.tag === selectedTag;
+    
+    return matchesSearch && matchesTag;
+  });
+
   return (
     <div className="container px-4 py-8 mx-auto fade-in">
       <div className="flex flex-col items-start gap-6">
@@ -74,19 +87,28 @@ const Index = () => {
           onCreatePrompt={handlePromptCreate}
         />
         
-        {prompts.length > 0 && (
-          <TagFilter 
-            tags={availableTags} 
-            selectedTag={selectedTag} 
-            onSelectTag={setSelectedTag} 
+        <div className="w-full flex flex-col gap-4 sm:flex-row sm:items-center">
+          <SearchBar 
+            onSearch={setSearchQuery} 
+            placeholder="Search your prompts..."
+            className="w-full sm:max-w-md"
           />
-        )}
+          
+          {prompts.length > 0 && (
+            <TagFilter 
+              tags={availableTags} 
+              selectedTag={selectedTag} 
+              onSelectTag={setSelectedTag} 
+            />
+          )}
+        </div>
         
         <PromptList
-          prompts={prompts}
+          prompts={filteredPrompts}
           selectedTag={selectedTag}
           onPromptClick={handlePromptClick}
           isLoading={isLoadingPrompts}
+          searchQuery={searchQuery}
         />
       </div>
 
