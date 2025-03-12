@@ -1,4 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export type Json =
   | string
