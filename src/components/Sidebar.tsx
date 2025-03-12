@@ -18,7 +18,7 @@ import { useAuth } from './AuthProvider';
 import { cn } from '@/lib/utils';
 
 interface NavItemProps {
-  icon: React.ElementType;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   label: string;
   onClick?: () => void;
   isCollapsed: boolean;

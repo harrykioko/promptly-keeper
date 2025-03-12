@@ -2,8 +2,9 @@
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Code, PenTool, Brain, Zap, FileQuestion, Hash } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export type TagType = 'general' | 'coding' | 'writing' | 'creative' | 'learning' | 'custom' | string;
+export type TagType = 'general' | 'coding' | 'writing' | 'creative' | 'learning' | 'custom' | 'all' | string;
 
 interface TagBadgeProps {
   tag: TagType;
@@ -12,6 +13,10 @@ interface TagBadgeProps {
 }
 
 const tagConfig: Record<string, { color: string; icon: React.ReactNode }> = {
+  all: {
+    color: "bg-primary hover:bg-primary/90 text-primary-foreground",
+    icon: <Hash className="h-3 w-3 mr-1" />
+  },
   general: { 
     color: "bg-slate-200 hover:bg-slate-300 text-slate-900", 
     icon: <Hash className="h-3 w-3 mr-1" /> 
@@ -38,13 +43,18 @@ const tagConfig: Record<string, { color: string; icon: React.ReactNode }> = {
   }
 };
 
-const TagBadge: React.FC<TagBadgeProps> = ({ tag, className, onClick }) => {
+const TagBadge = ({ tag, className, onClick }: TagBadgeProps) => {
   const config = tagConfig[tag] || tagConfig.general;
   
   return (
     <Badge 
-      className={`flex items-center ${config.color} ${onClick ? 'cursor-pointer' : ''} ${className || ''}`} 
       variant="outline"
+      className={cn(
+        "flex items-center",
+        config.color,
+        onClick ? 'cursor-pointer' : '',
+        className
+      )}
       onClick={onClick}
     >
       {config.icon}

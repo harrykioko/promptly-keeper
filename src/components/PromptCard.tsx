@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,7 @@ const PromptCard = ({
 }: PromptCardProps) => {
   const { toast } = useToast();
 
-  const copyToClipboard = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const copyToClipboard = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation(); // Prevent opening the dialog when clicking the copy button
     await navigator.clipboard.writeText(content);
     toast({

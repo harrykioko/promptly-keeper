@@ -10,11 +10,11 @@ interface PromptHeaderProps {
   onCreatePrompt: (prompt: { title: string; content: string; tag: string }) => void;
 }
 
-const PromptHeader: React.FC<PromptHeaderProps> = ({ 
+const PromptHeader = ({ 
   displayName, 
   onSignOut, 
   onCreatePrompt 
-}) => {
+}: PromptHeaderProps) => {
   return (
     <div className="flex items-center justify-between w-full">
       <div>

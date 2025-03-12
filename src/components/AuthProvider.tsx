@@ -1,5 +1,6 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { Profile } from '@/types/database';
@@ -30,7 +31,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const fetchProfile = async (userId: string) => {
     const { data, error } = await supabase
@@ -73,6 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event, session?.user?.id);
         if (session?.user) {
           setUser(session.user);
           const profile = await fetchProfile(session.user.id);
@@ -84,12 +87,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
 
         // If user is signed in and the current route is / redirect the user to /dashboard
-        if (event === 'SIGNED_IN' && router.pathname === '/') {
-          router.push('/dashboard');
+        if (event === 'SIGNED_IN' && location.pathname === '/auth') {
+          navigate('/');
         }
         // If user is signed out and the current route is not / redirect the user to /
-        if (event === 'SIGNED_OUT' && router.pathname !== '/') {
-          router.push('/');
+        if (event === 'SIGNED_OUT' && location.pathname !== '/auth') {
+          navigate('/auth');
         }
       }
     );
@@ -97,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [router]);
+  }, [navigate, location]);
 
   const value = {
     user,

@@ -27,7 +27,7 @@ const TemplateCard = ({
 }: TemplateCardProps) => {
   const { toast } = useToast();
   
-  const handleCopyClick = (e: React.MouseEvent) => {
+  const handleCopyClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation();
     // This would be replaced with actual logic to copy all prompts
     toast({
