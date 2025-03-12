@@ -4,8 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { TagType } from '@/components/TagBadge';
+import { Prompt as DatabasePrompt } from '@/types/database';
 
-interface Prompt {
+export interface Prompt {
   id: string;
   title: string;
   content: string;
@@ -40,7 +41,7 @@ export const usePrompts = (userId: string | undefined) => {
         return [];
       }
       
-      return data.map(prompt => ({
+      return data.map((prompt: DatabasePrompt) => ({
         id: prompt.id,
         title: prompt.title,
         content: prompt.content,
@@ -81,7 +82,7 @@ export const usePrompts = (userId: string | undefined) => {
         description: "Your prompt has been saved successfully.",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error creating prompt",
         description: error.message,
@@ -111,5 +112,3 @@ export const usePrompts = (userId: string | undefined) => {
     handlePromptClick
   };
 };
-
-export type { Prompt };

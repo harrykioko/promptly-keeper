@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -33,11 +63,70 @@ export type Database = {
         }
         Relationships: []
       }
+      prompt_tags: {
+        Row: {
+          created_at: string
+          id: string
+          prompt_id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          prompt_id: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          prompt_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_tags_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prompt_tags_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts_with_tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prompt_tags_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "secure_prompts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prompt_tags_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "templates_with_prompts"
+            referencedColumns: ["prompt_id"]
+          },
+          {
+            foreignKeyName: "prompt_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prompts: {
         Row: {
           content: string
           created_at: string
+          encrypted_content: string | null
           id: string
+          is_encrypted: boolean | null
           tag: string
           title: string
           user_id: string
@@ -45,7 +134,9 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
+          encrypted_content?: string | null
           id?: string
+          is_encrypted?: boolean | null
           tag: string
           title: string
           user_id: string
@@ -53,10 +144,30 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
+          encrypted_content?: string | null
           id?: string
+          is_encrypted?: boolean | null
           tag?: string
           title?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -88,11 +199,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "template_prompts_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts_with_tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_prompts_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "secure_prompts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_prompts_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "templates_with_prompts"
+            referencedColumns: ["prompt_id"]
+          },
+          {
             foreignKeyName: "template_prompts_template_id_fkey"
             columns: ["template_id"]
             isOneToOne: false
             referencedRelation: "templates"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_prompts_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates_with_prompts"
+            referencedColumns: ["template_id"]
           },
         ]
       }
@@ -125,10 +264,81 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      prompts_with_tags: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string | null
+          tag: string | null
+          tags: Json | null
+          title: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      secure_prompts: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string | null
+          is_encrypted: boolean | null
+          tag: string | null
+          title: string | null
+          user_id: string | null
+        }
+        Insert: {
+          content?: never
+          created_at?: string | null
+          id?: string | null
+          is_encrypted?: boolean | null
+          tag?: string | null
+          title?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          content?: never
+          created_at?: string | null
+          id?: string | null
+          is_encrypted?: boolean | null
+          tag?: string | null
+          title?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      templates_with_prompts: {
+        Row: {
+          position: number | null
+          prompt_content: string | null
+          prompt_created_at: string | null
+          prompt_id: string | null
+          prompt_tag: string | null
+          prompt_title: string | null
+          sequence: boolean | null
+          template_created_at: string | null
+          template_description: string | null
+          template_id: string | null
+          template_title: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      decrypt_content: {
+        Args: {
+          encrypted_content: string
+          key: string
+        }
+        Returns: string
+      }
+      encrypt_content: {
+        Args: {
+          content: string
+          key: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

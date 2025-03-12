@@ -7,6 +7,7 @@ import TagFilter from '@/components/TagFilter';
 import PromptHeader from '@/components/PromptHeader';
 import PromptList from '@/components/PromptList';
 import { usePrompts } from '@/hooks/usePrompts';
+import { TagType } from '@/components/TagBadge';
 
 const Index = () => {
   const { user, profile, signOut, isLoading } = useAuth();
@@ -36,9 +37,9 @@ const Index = () => {
 
   const displayName = profile?.first_name || user.email?.split('@')[0] || 'there';
   
-  const availableTags = Array.from(
+  const availableTags: TagType[] = Array.from(
     new Set(prompts.map(prompt => prompt.tag))
-  );
+  ) as TagType[];
 
   return (
     <div className="container px-4 py-8 mx-auto fade-in">
