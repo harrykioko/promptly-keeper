@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import Documents from "./pages/Documents";
 import AITools from "./pages/AITools";
 import Profile from "./pages/Profile";
 import { cn } from "./lib/utils";
+import * as React from 'react';
 import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();

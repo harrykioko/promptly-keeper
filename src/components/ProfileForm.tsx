@@ -1,5 +1,5 @@
 
-import React from 'react';
+import * as React from 'react';
 import { Button } from "@/components/ui/button";
 import { User } from '@supabase/supabase-js';
 import { Loader2 } from 'lucide-react';

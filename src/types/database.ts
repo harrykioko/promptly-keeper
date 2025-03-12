@@ -579,3 +579,6 @@ export type UpdateTemplatePrompt = UpdateTables<'template_prompts'>;
 
 // Type-safe client
 export type TypedSupabaseClient = SupabaseClient<Database>; 
+
+// No need for additional exports since all types are already exported individually
+// export type { Json }; 

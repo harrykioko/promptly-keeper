@@ -1,5 +1,5 @@
 
-import React from 'react';
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/components/AuthProvider';
 import ProfileForm from '@/components/ProfileForm';

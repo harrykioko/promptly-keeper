@@ -1,5 +1,4 @@
-
-import React from 'react';
+import * as React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Code, PenTool, Brain, Zap, FileQuestion, Hash } from "lucide-react";
 
@@ -11,7 +10,7 @@ interface TagBadgeProps {
   onClick?: () => void;
 }
 
-const tagConfig: Record<string, { color: string; icon: React.ReactNode }> = {
+const tagConfig: Record<string, { color: string; icon: JSX.Element }> = {
   general: { 
     color: "bg-slate-200 hover:bg-slate-300 text-slate-900", 
     icon: <Hash className="h-3 w-3 mr-1" /> 
@@ -38,7 +37,7 @@ const tagConfig: Record<string, { color: string; icon: React.ReactNode }> = {
   }
 };
 
-const TagBadge: React.FC<TagBadgeProps> = ({ tag, className, onClick }) => {
+const TagBadge = ({ tag, className, onClick }: TagBadgeProps): JSX.Element => {
   const config = tagConfig[tag] || tagConfig.general;
   
   return (

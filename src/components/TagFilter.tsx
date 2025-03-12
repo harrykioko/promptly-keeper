@@ -1,5 +1,5 @@
 
-import React from 'react';
+import * as React from 'react';
 import TagBadge, { TagType } from './TagBadge';
 
 interface TagFilterProps {

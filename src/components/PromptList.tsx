@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import PromptCard from '@/components/PromptCard';
 import { TagType } from '@/components/TagBadge';
 

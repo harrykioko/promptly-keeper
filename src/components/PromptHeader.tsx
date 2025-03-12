@@ -1,5 +1,5 @@
 
-import React from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import CreatePromptDialog from '@/components/CreatePromptDialog';
