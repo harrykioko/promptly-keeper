@@ -27,6 +27,7 @@ export const useProfileForm = (user: User, onProfileUpdate?: (profile: Profile) 
     async function fetchProfile() {
       try {
         setLoading(true);
+        
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -34,13 +35,7 @@ export const useProfileForm = (user: User, onProfileUpdate?: (profile: Profile) 
           .single();
 
         if (error) {
-          console.error('Error fetching profile:', error);
-          toast({
-            title: "Error loading profile",
-            description: error.message,
-            variant: "destructive",
-          });
-          return;
+          throw error;
         }
 
         if (data) {
@@ -51,14 +46,21 @@ export const useProfileForm = (user: User, onProfileUpdate?: (profile: Profile) 
             avatar_url: data.avatar_url,
           });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching profile:', error);
+        toast({
+          title: "Error loading profile",
+          description: error.message,
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     }
 
-    fetchProfile();
+    if (user) {
+      fetchProfile();
+    }
   }, [user.id, toast]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,16 +70,16 @@ export const useProfileForm = (user: User, onProfileUpdate?: (profile: Profile) 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
+
     try {
       setSaving(true);
-      
-      const { first_name, last_name } = profile;
       
       const { error } = await supabase
         .from('profiles')
         .update({
-          first_name,
-          last_name,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id);
