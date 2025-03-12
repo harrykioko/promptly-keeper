@@ -15,7 +15,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
-          updated_at: string
+          updated_at: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -33,49 +33,11 @@ export type Database = {
         }
         Relationships: []
       }
-      prompt_tags: {
-        Row: {
-          created_at: string
-          id: string
-          prompt_id: string
-          tag_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          prompt_id: string
-          tag_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          prompt_id?: string
-          tag_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "prompt_tags_prompt_id_fkey"
-            columns: ["prompt_id"]
-            isOneToOne: false
-            referencedRelation: "prompts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "prompt_tags_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       prompts: {
         Row: {
           content: string
           created_at: string
-          encrypted_content: string | null
           id: string
-          is_encrypted: boolean
           tag: string
           title: string
           user_id: string
@@ -83,9 +45,7 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
-          encrypted_content?: string | null
           id?: string
-          is_encrypted?: boolean
           tag: string
           title: string
           user_id: string
@@ -93,38 +53,10 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
-          encrypted_content?: string | null
           id?: string
-          is_encrypted?: boolean
           tag?: string
           title?: string
           user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_prompts_user_id"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      tags: {
-        Row: {
-          created_at: string
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          name?: string
         }
         Relationships: []
       }
@@ -189,102 +121,17 @@ export type Database = {
           title?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "fk_templates_user_id"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
+        Relationships: []
       }
     }
     Views: {
-      prompts_with_tags: {
-        Row: {
-          content: string
-          created_at: string
-          id: string
-          tag: string
-          tags: Json
-          title: string
-          user_id: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_prompts_user_id"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      secure_prompts: {
-        Row: {
-          content: string | null
-          created_at: string
-          id: string
-          is_encrypted: boolean
-          tag: string
-          title: string
-          user_id: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_prompts_user_id"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      templates_with_prompts: {
-        Row: {
-          position: number | null
-          prompt_content: string | null
-          prompt_created_at: string | null
-          prompt_id: string | null
-          prompt_tag: string | null
-          prompt_title: string | null
-          sequence: boolean
-          template_created_at: string
-          template_description: string | null
-          template_id: string
-          template_title: string
-          user_id: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_templates_user_id"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
-      decrypt_content: {
-        Args: {
-          encrypted_content: string
-          key: string
-        }
-        Returns: string
-      }
-      encrypt_content: {
-        Args: {
-          content: string
-          key: string
-        }
-        Returns: string
-      }
+      [_ in never]: never
     }
     Enums: {
-      tag_type: "general" | "code" | "writing" | "chat" | "other"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
