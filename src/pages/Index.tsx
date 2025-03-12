@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/components/AuthProvider';
@@ -8,6 +9,7 @@ import PromptList from '@/components/PromptList';
 import SearchBar from '@/components/SearchBar';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useToast } from '@/components/ui/use-toast';
+import { TagType } from '@/components/TagBadge';
 
 const Index = () => {
   const { user, profile, signOut, isLoading } = useAuth();
@@ -54,9 +56,9 @@ const Index = () => {
 
   const displayName = profile?.first_name || user.email?.split('@')[0] || 'there';
   
-  const availableTags = Array.from(
-    new Set(prompts.map(prompt => prompt.tag))
-  );
+  const availableTags: TagType[] = prompts
+    .map(prompt => prompt.tag)
+    .filter((tag, index, self) => self.indexOf(tag) === index) as TagType[];
 
   const handlePromptCreate = (prompt: { title: string; content: string; tag: string }) => {
     console.log('Creating prompt:', prompt);

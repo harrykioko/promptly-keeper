@@ -1,210 +1,122 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from "@/components/ui/use-toast";
 import { TagType } from '@/components/TagBadge';
-import { Prompt as DbPrompt, NewPrompt } from '@/types/database';
+import { Tag } from '@/types/database';
 
-export interface Tag {
+interface Prompt {
   id: string;
-  name: string;
-}
-
-// Extended Prompt interface that includes UI-specific properties
-export interface Prompt extends Omit<DbPrompt, 'tags'> {
+  title: string;
+  content: string;
   tag: TagType;
-  tags: Tag[];
   createdAt: Date;
-  isEncrypted?: boolean;
-  position?: number; // Add position property for template ordering
+  tags?: Tag[];
 }
 
-export const usePrompts = (userId: string | undefined) => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [selectedTag, setSelectedTag] = useState<TagType | null>(null);
+export const usePrompts = (userId?: string) => {
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [isLoadingPrompts, setIsLoadingPrompts] = useState(true);
+  const [selectedTag, setSelectedTag] = useState<TagType>('all');
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const { toast } = useToast();
 
-  const { data: prompts = [], isLoading: isLoadingPrompts } = useQuery({
-    queryKey: ['prompts', userId, selectedTag],
-    queryFn: async () => {
-      if (!userId) return [];
-      
-      console.log('Fetching prompts for user ID:', userId);
-      
-      // Use the prompts_with_tags view for better performance
-      let query = supabase
-        .from('prompts_with_tags')
-        .select('*')
-        .eq('user_id', userId);
-      
-      // Apply tag filter if selected
-      if (selectedTag) {
-        query = query.eq('tag', selectedTag);
-      }
-      
-      const { data, error } = await query.order('created_at', { ascending: false });
-      
-      if (error) {
+  // Fetch prompts from Supabase
+  useEffect(() => {
+    if (!userId) return;
+    
+    const fetchPrompts = async () => {
+      try {
+        setIsLoadingPrompts(true);
+        
+        const { data, error } = await supabase
+          .from('prompts')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+          
+        if (error) {
+          throw error;
+        }
+        
+        if (data) {
+          // Transform the data to include Date objects
+          const transformedPrompts = data.map(prompt => ({
+            id: prompt.id,
+            title: prompt.title,
+            content: prompt.content,
+            tag: prompt.tag as TagType,
+            createdAt: new Date(prompt.created_at),
+            tags: [], // Initialize empty array for tags
+          }));
+          
+          setPrompts(transformedPrompts);
+        }
+      } catch (error: any) {
         console.error('Error fetching prompts:', error);
         toast({
-          title: 'Error fetching prompts',
+          title: "Failed to load prompts",
           description: error.message,
-          variant: 'destructive',
+          variant: "destructive",
         });
-        return [];
+      } finally {
+        setIsLoadingPrompts(false);
       }
-      
-      console.log('Prompts fetched:', data);
-      
-      return data.map(prompt => ({
-        ...prompt,
-        createdAt: new Date(prompt.created_at),
-        tags: prompt.tags as Tag[],
-      })) as Prompt[];
-    },
-    enabled: !!userId,
-  });
+    };
+    
+    fetchPrompts();
+  }, [userId, toast]);
 
-  const { data: availableTags = [] } = useQuery({
-    queryKey: ['tags'],
-    queryFn: async () => {
+  // Create a new prompt
+  const handleCreatePrompt = async (promptData: { title: string; content: string; tag: string }) => {
+    if (!userId) return;
+    
+    try {
       const { data, error } = await supabase
-        .from('tags')
-        .select('*')
-        .order('name');
-      
-      if (error) {
-        console.error('Error fetching tags:', error);
-        return [];
-      }
-      
-      return data as Tag[];
-    },
-  });
-
-  const createPromptMutation = useMutation({
-    mutationFn: async (newPrompt: { 
-      title: string; 
-      content: string; 
-      tag: string;
-      isEncrypted?: boolean;
-      tagIds?: string[];
-    }) => {
-      if (!userId) throw new Error('User not authenticated');
-      
-      console.log('Creating prompt for user ID:', userId, 'Prompt:', newPrompt);
-      
-      // Start a transaction
-      // 1. Create the prompt
-      const promptData: NewPrompt = {
-        title: newPrompt.title,
-        content: newPrompt.content,
-        user_id: userId,
-        is_public: false,
-        version: 1,
-        is_favorite: false,
-        usage_count: 0,
-      };
-      
-      // Add tag-related fields
-      if (newPrompt.tag) {
-        promptData.tags = [newPrompt.tag];
-      }
-      
-      // Add encryption-related fields if needed
-      if (newPrompt.isEncrypted) {
-        const encryptedContent = await encryptContent(newPrompt.content);
-        if (encryptedContent) {
-          // These fields would be added to the actual database schema
-          // but we're using them here for compatibility with the UI
-          (promptData as any).is_encrypted = true;
-          (promptData as any).encrypted_content = encryptedContent;
-        }
-      }
-      
-      const { data, error: promptError } = await supabase
         .from('prompts')
-        .insert(promptData)
-        .select()
-        .single();
-      
-      if (promptError) {
-        console.error('Error creating prompt:', promptError);
-        throw promptError;
+        .insert([
+          {
+            title: promptData.title,
+            content: promptData.content,
+            tag: promptData.tag,
+            user_id: userId,
+          }
+        ])
+        .select();
+        
+      if (error) {
+        throw error;
       }
       
-      // 2. Add tags if provided
-      if (newPrompt.tagIds && newPrompt.tagIds.length > 0 && data) {
-        const promptTags = newPrompt.tagIds.map(tagId => ({
-          prompt_id: data.id,
-          tag_id: tagId
-        }));
+      if (data && data.length > 0) {
+        const newPrompt = {
+          id: data[0].id,
+          title: data[0].title,
+          content: data[0].content,
+          tag: data[0].tag as TagType,
+          createdAt: new Date(data[0].created_at),
+          tags: [],
+        };
         
-        const { error: tagError } = await supabase
-          .from('prompt_tags')
-          .insert(promptTags);
+        setPrompts(current => [newPrompt, ...current]);
         
-        if (tagError) {
-          console.error('Error adding tags to prompt:', tagError);
-          // Continue anyway, the prompt was created successfully
-        }
+        toast({
+          title: "Prompt created",
+          description: "Your prompt has been created successfully.",
+        });
       }
-      
-      console.log('Prompt created:', data);
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['prompts', userId] });
+    } catch (error: any) {
+      console.error('Error creating prompt:', error);
       toast({
-        title: "Success",
-        description: "Your prompt has been saved successfully.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
+        title: "Failed to create prompt",
         description: error.message,
         variant: "destructive",
       });
-    },
-  });
-
-  // Helper function to encrypt content
-  const encryptContent = async (content: string): Promise<string | null> => {
-    try {
-      // In a real app, you would use a secure encryption key from environment variables
-      // For this example, we'll use a placeholder
-      const encryptionKey = 'PLACEHOLDER_ENCRYPTION_KEY';
-      
-      const { data, error } = await supabase.rpc('encrypt_content', {
-        content,
-        key: encryptionKey
-      });
-      
-      if (error) {
-        console.error('Error encrypting content:', error);
-        return null;
-      }
-      
-      return data;
-    } catch (error) {
-      console.error('Error encrypting content:', error);
-      return null;
     }
   };
 
-  const handleCreatePrompt = (prompt: { 
-    title: string; 
-    content: string; 
-    tag: string;
-    isEncrypted?: boolean;
-    tagIds?: string[];
-  }) => {
-    createPromptMutation.mutate(prompt);
-  };
-
+  // Handle prompt click to show details
   const handlePromptClick = (prompt: Prompt) => {
     setSelectedPrompt(prompt);
     setDetailDialogOpen(true);
@@ -219,7 +131,6 @@ export const usePrompts = (userId: string | undefined) => {
     detailDialogOpen,
     setDetailDialogOpen,
     handleCreatePrompt,
-    handlePromptClick,
-    availableTags
+    handlePromptClick
   };
 };

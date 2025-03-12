@@ -31,10 +31,20 @@ export interface TagBadgeProps {
 }
 
 const TagBadge = ({ tag, className = "", onClick, selected = false }: TagBadgeProps) => {
-  // Determine the variant based on the tag
-  let variant = tag as keyof typeof tagVariants.variants.variant;
-  if (!tagVariants.variants.variant[variant]) {
-    variant = 'custom';
+  // Map the tag to a valid variant
+  let variantKey: "general" | "coding" | "writing" | "creative" | "learning" | "custom" | "all" = "custom";
+  
+  // Check if tag is one of our predefined types
+  if (
+    tag === "general" || 
+    tag === "coding" || 
+    tag === "writing" || 
+    tag === "creative" || 
+    tag === "learning" || 
+    tag === "custom" || 
+    tag === "all"
+  ) {
+    variantKey = tag as any;
   }
 
   // Set additional classes if tag is selected
@@ -43,7 +53,7 @@ const TagBadge = ({ tag, className = "", onClick, selected = false }: TagBadgePr
   return (
     <Badge 
       variant="outline" 
-      className={`${tagVariants({ variant })} ${selectedClass} transition-all cursor-pointer ${className}`}
+      className={`${tagVariants({ variant: variantKey })} ${selectedClass} transition-all cursor-pointer ${className}`}
       onClick={onClick}
     >
       {tag}

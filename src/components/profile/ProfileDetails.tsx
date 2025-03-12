@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Profile } from '@/hooks/useProfileForm';
+import { Profile } from '@/types/database';
 import { User } from '@supabase/supabase-js';
 
 interface ProfileDetailsProps {

@@ -22,7 +22,7 @@ const CreatePromptDialog = ({ onCreatePrompt }: CreatePromptDialogProps) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!title || !content || !tag) {

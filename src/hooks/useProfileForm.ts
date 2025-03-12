@@ -1,8 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from "@/components/ui/use-toast";
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { Profile } from '@/types/database';
+
+export { Profile }; // Export the Profile type
 
 export const useProfileForm = (user: SupabaseUser, onProfileUpdate?: (profile: Profile) => void) => {
   const [profile, setProfile] = useState<Profile>({
