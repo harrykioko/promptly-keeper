@@ -1,5 +1,5 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -47,95 +47,10 @@
   }
 }
 
-@layer utilities {
-  /* Animation keyframes */
-  @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-
-  @keyframes slideInRight {
-    0% { transform: translateX(100%); opacity: 0; }
-    100% { transform: translateX(0); opacity: 1; }
-  }
-
-  @keyframes slideInLeft {
-    0% { transform: translateX(-100%); opacity: 0; }
-    100% { transform: translateX(0); opacity: 1; }
-  }
-
-  @keyframes slideUp {
-    0% { transform: translateY(20px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-  }
-
-  @keyframes scaleIn {
-    0% { transform: scale(0.8); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  @keyframes pulseSubtle {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
-  }
-}
-
-/* Enhanced component styles */
 .prompt-card {
-  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
-}
-
-.glass-prompt-card {
-  @apply transition-all duration-300 hover:shadow-lg transform hover:scale-[1.02];
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  border-radius: 1rem;
+  @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
 }
 
 .fade-in {
   @apply animate-fade-in;
-}
-
-/* Gradient text */
-.text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-primary-700;
-}
-
-/* Glassmorphism background */
-.glass-bg {
-  @apply relative;
-}
-
-.glass-bg::before {
-  content: '';
-  @apply absolute inset-0 bg-gradient-to-br from-[#e0eafc] to-[#cfdef3] -z-10;
-}
-
-/* Glass styling for UI elements */
-.glass-ui {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-}
-
-/* Badge styles */
-.badge {
-  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors;
-}
-
-.badge-default {
-  @apply bg-primary text-primary-foreground hover:bg-primary/80;
-}
-
-.badge-secondary {
-  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
-}
-
-.badge-outline {
-  @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
 }

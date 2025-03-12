@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import React from 'react';
 import { 
   Dialog,
   DialogContent,
@@ -26,11 +26,11 @@ interface PromptDetailDialogProps {
   } | null;
 }
 
-const PromptDetailDialog = ({ 
+const PromptDetailDialog: React.FC<PromptDetailDialogProps> = ({ 
   open, 
   onOpenChange, 
   prompt 
-}: PromptDetailDialogProps) => {
+}) => {
   const { toast } = useToast();
 
   const copyToClipboard = async () => {

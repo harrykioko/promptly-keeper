@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import CreatePromptDialog from '@/components/CreatePromptDialog';
@@ -10,11 +10,11 @@ interface PromptHeaderProps {
   onCreatePrompt: (prompt: { title: string; content: string; tag: string }) => void;
 }
 
-const PromptHeader = ({ 
+const PromptHeader: React.FC<PromptHeaderProps> = ({ 
   displayName, 
   onSignOut, 
   onCreatePrompt 
-}: PromptHeaderProps) => {
+}) => {
   return (
     <div className="flex items-center justify-between w-full">
       <div>

@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
@@ -13,21 +13,12 @@ interface PromptCardProps {
   tag: TagType;
   createdAt: Date;
   onClick: () => void;
-  searchQuery?: string;
 }
 
-const PromptCard = ({ 
-  id, 
-  title, 
-  content, 
-  tag, 
-  createdAt, 
-  onClick, 
-  searchQuery = '' 
-}: PromptCardProps) => {
+const PromptCard = ({ id, title, content, tag, createdAt, onClick }: PromptCardProps) => {
   const { toast } = useToast();
 
-  const copyToClipboard = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const copyToClipboard = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent opening the dialog when clicking the copy button
     await navigator.clipboard.writeText(content);
     toast({
@@ -36,24 +27,10 @@ const PromptCard = ({
     });
   };
 
-  // Function to highlight text that matches the search query
-  const highlightText = (text: string, query: string) => {
-    if (!query.trim()) return text;
-    
-    const regex = new RegExp(`(${query.trim()})`, 'gi');
-    const parts = text.split(regex);
-    
-    return parts.map((part, i) => 
-      regex.test(part) ? <mark key={i} className="bg-yellow-100 dark:bg-yellow-800/30">{part}</mark> : part
-    );
-  };
-
   return (
     <Card className="prompt-card cursor-pointer" onClick={onClick}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl font-semibold">
-          {highlightText(title, searchQuery)}
-        </CardTitle>
+        <CardTitle className="text-xl font-semibold">{title}</CardTitle>
         <Button
           variant="ghost"
           size="icon"
@@ -68,7 +45,7 @@ const PromptCard = ({
           <TagBadge tag={tag} />
         </div>
         <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-3">
-          {highlightText(content, searchQuery)}
+          {content}
         </p>
         <div className="mt-4 text-xs text-muted-foreground">
           Created: {createdAt.toLocaleDateString()}

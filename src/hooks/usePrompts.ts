@@ -1,9 +1,9 @@
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useToast } from "@/components/ui/use-toast";
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
 import { TagType } from '@/components/TagBadge';
-import { Tag } from '@/types/database';
 
 interface Prompt {
   id: string;
@@ -11,119 +11,96 @@ interface Prompt {
   content: string;
   tag: TagType;
   createdAt: Date;
-  tags?: Tag[];
 }
 
-export const usePrompts = (userId?: string) => {
-  const [prompts, setPrompts] = useState<Prompt[]>([]);
-  const [isLoadingPrompts, setIsLoadingPrompts] = useState(true);
-  const [selectedTag, setSelectedTag] = useState<TagType>('all');
+export const usePrompts = (userId: string | undefined) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedTag, setSelectedTag] = useState<TagType | null>(null);
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  const { toast } = useToast();
 
-  // Fetch prompts from Supabase
-  useEffect(() => {
-    if (!userId) return;
-    
-    const fetchPrompts = async () => {
-      try {
-        setIsLoadingPrompts(true);
-        
-        const { data, error } = await supabase
-          .from('prompts')
-          .select('*')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false });
-          
-        if (error) {
-          throw error;
-        }
-        
-        if (data) {
-          // Transform the data to include Date objects
-          const transformedPrompts = data.map(prompt => ({
-            id: prompt.id,
-            title: prompt.title,
-            content: prompt.content,
-            tag: prompt.tag as TagType,
-            createdAt: new Date(prompt.created_at),
-            tags: [], // Initialize empty array for tags
-          }));
-          
-          setPrompts(transformedPrompts);
-        }
-      } catch (error: any) {
+  const { data: promptsData, isLoading: isLoadingPrompts } = useQuery({
+    queryKey: ['prompts'],
+    queryFn: async () => {
+      if (!userId) return [];
+      
+      const { data, error } = await supabase
+        .from('prompts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
         console.error('Error fetching prompts:', error);
         toast({
-          title: "Failed to load prompts",
+          title: 'Error fetching prompts',
           description: error.message,
-          variant: "destructive",
+          variant: 'destructive',
         });
-      } finally {
-        setIsLoadingPrompts(false);
+        return [];
       }
-    };
-    
-    fetchPrompts();
-  }, [userId, toast]);
+      
+      return data.map(prompt => ({
+        id: prompt.id,
+        title: prompt.title,
+        content: prompt.content,
+        tag: prompt.tag as TagType,
+        createdAt: new Date(prompt.created_at),
+      }));
+    },
+    enabled: !!userId,
+  });
 
-  // Create a new prompt
-  const handleCreatePrompt = async (promptData: { title: string; content: string; tag: string }) => {
-    if (!userId) return;
-    
-    try {
+  const createPromptMutation = useMutation({
+    mutationFn: async (newPrompt: { title: string; content: string; tag: string }) => {
+      if (!userId) throw new Error('User not authenticated');
+      
       const { data, error } = await supabase
         .from('prompts')
         .insert([
           {
-            title: promptData.title,
-            content: promptData.content,
-            tag: promptData.tag,
+            title: newPrompt.title,
+            content: newPrompt.content,
+            tag: newPrompt.tag,
             user_id: userId,
           }
         ])
         .select();
-        
+      
       if (error) {
+        console.error('Error creating prompt:', error);
         throw error;
       }
       
-      if (data && data.length > 0) {
-        const newPrompt = {
-          id: data[0].id,
-          title: data[0].title,
-          content: data[0].content,
-          tag: data[0].tag as TagType,
-          createdAt: new Date(data[0].created_at),
-          tags: [],
-        };
-        
-        setPrompts(current => [newPrompt, ...current]);
-        
-        toast({
-          title: "Prompt created",
-          description: "Your prompt has been created successfully.",
-        });
-      }
-    } catch (error: any) {
-      console.error('Error creating prompt:', error);
+      return data[0];
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['prompts'] });
       toast({
-        title: "Failed to create prompt",
+        title: "Prompt created",
+        description: "Your prompt has been saved successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error creating prompt",
         description: error.message,
         variant: "destructive",
       });
-    }
+    },
+  });
+
+  const handleCreatePrompt = (prompt: { title: string; content: string; tag: string }) => {
+    createPromptMutation.mutate(prompt);
   };
 
-  // Handle prompt click to show details
   const handlePromptClick = (prompt: Prompt) => {
     setSelectedPrompt(prompt);
     setDetailDialogOpen(true);
   };
 
   return {
-    prompts,
+    prompts: promptsData || [],
     isLoadingPrompts,
     selectedTag,
     setSelectedTag,
@@ -134,3 +111,5 @@ export const usePrompts = (userId?: string) => {
     handlePromptClick
   };
 };
+
+export type { Prompt };

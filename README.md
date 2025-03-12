@@ -1,98 +1,69 @@
-# Promptly - AI Prompt Management System
+# Welcome to your Lovable project
 
-Promptly is a comprehensive AI prompt management system that helps you organize, version, and share your AI prompts.
+## Project info
 
-## Features
+**URL**: https://lovable.dev/projects/caad4341-8c2a-4a72-8133-f01d5811f801
 
-- **Prompt Management**: Create, edit, and organize your AI prompts
-- **Versioning**: Keep track of changes to your prompts over time
-- **Categories**: Organize prompts into categories for easy access
-- **Sharing**: Share prompts with other users
-- **Usage Tracking**: Track how often prompts are used
-- **Favorites**: Mark prompts as favorites for quick access
+## How can I edit this code?
 
-## Tech Stack
+There are several ways of editing your application.
 
-- **Frontend**: Next.js, React, TypeScript, Tailwind CSS
-- **Backend**: Supabase (PostgreSQL, Authentication, Storage)
-- **Deployment**: Vercel
+**Use Lovable**
 
-## Getting Started
+Simply visit the [Lovable Project](https://lovable.dev/projects/caad4341-8c2a-4a72-8133-f01d5811f801) and start prompting.
 
-### Prerequisites
+Changes made via Lovable will be committed automatically to this repo.
 
-- Node.js (v14 or later)
-- npm or yarn
-- Supabase account
+**Use your preferred IDE**
 
-### Installation
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/promptly.git
-   cd promptly
-   ```
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-2. Install dependencies:
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
+Follow these steps:
 
-3. Set up environment variables:
-   Create a `.env.local` file in the root directory with the following variables:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-   ```
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
 
-4. Apply database migrations:
-   ```bash
-   node scripts/apply-migrations.js
-   ```
-   Follow the instructions provided by the script to apply the migrations to your Supabase project.
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
 
-5. Start the development server:
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
+# Step 3: Install the necessary dependencies.
+npm i
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+# Step 4: Start the development server with auto-reloading and an instant preview.
+npm run dev
+```
 
-## Database Structure
+**Edit a file directly in GitHub**
 
-The application uses a PostgreSQL database hosted on Supabase with the following tables:
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
 
-- `users`: User information
-- `prompts`: AI prompts created by users
-- `categories`: Categories for organizing prompts
-- `prompt_versions`: Version history of prompts
-- `prompt_usage`: Usage tracking for prompts
-- `shared_prompts`: Prompts shared between users
+**Use GitHub Codespaces**
 
-For detailed information about the database structure, see [supabase/README.md](supabase/README.md).
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## Type Safety
+## What technologies are used for this project?
 
-The application uses TypeScript for type safety. The database schema is defined as TypeScript types in `src/types/database.ts`.
+This project is built with .
 
-## Contributing
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## How can I deploy this project?
 
-## License
+Simply open [Lovable](https://lovable.dev/projects/caad4341-8c2a-4a72-8133-f01d5811f801) and click on Share -> Publish.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## I want to use a custom domain - is that possible?
 
-## Acknowledgments
-
-- [Supabase](https://supabase.io/) for the backend infrastructure
-- [Next.js](https://nextjs.org/) for the frontend framework
-- [Tailwind CSS](https://tailwindcss.com/) for styling
+We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)

@@ -1,7 +1,6 @@
 
-import * as React from 'react';
+import React from 'react';
 import TagBadge, { TagType } from './TagBadge';
-import { cn } from '@/lib/utils';
 
 interface TagFilterProps {
   tags: TagType[];
@@ -9,12 +8,12 @@ interface TagFilterProps {
   onSelectTag: (tag: TagType | null) => void;
 }
 
-const TagFilter = ({ tags, selectedTag, onSelectTag }: TagFilterProps) => {
+const TagFilter: React.FC<TagFilterProps> = ({ tags, selectedTag, onSelectTag }) => {
   return (
     <div className="flex flex-wrap gap-2 mb-6">
       <TagBadge 
         tag="all" 
-        className={cn(selectedTag === null ? 'bg-primary text-primary-foreground' : 'bg-background text-foreground')}
+        className={`bg-${selectedTag === null ? 'primary text-primary-foreground' : 'background text-foreground'}`}
         onClick={() => onSelectTag(null)} 
       />
       {tags.map((tag) => (

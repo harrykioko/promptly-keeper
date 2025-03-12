@@ -1,62 +1,54 @@
 
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
-import { cva } from "class-variance-authority";
+import { BookOpen, Code, PenTool, Brain, Zap, FileQuestion, Hash } from "lucide-react";
 
-// Define the tag variant styles
-const tagVariants = cva("", {
-  variants: {
-    variant: {
-      general: "bg-gray-100 text-gray-800 hover:bg-gray-200",
-      coding: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-      writing: "bg-purple-100 text-purple-800 hover:bg-purple-200",
-      creative: "bg-pink-100 text-pink-800 hover:bg-pink-200",
-      learning: "bg-green-100 text-green-800 hover:bg-green-200",
-      custom: "bg-amber-100 text-amber-800 hover:bg-amber-200",
-      all: "bg-slate-100 text-slate-800 hover:bg-slate-200",
-    }
-  },
-  defaultVariants: {
-    variant: "general",
-  },
-});
+export type TagType = 'general' | 'coding' | 'writing' | 'creative' | 'learning' | 'custom' | string;
 
-export type TagType = 'general' | 'coding' | 'writing' | 'creative' | 'learning' | 'custom' | 'all' | string;
-
-export interface TagBadgeProps {
+interface TagBadgeProps {
   tag: TagType;
   className?: string;
   onClick?: () => void;
-  selected?: boolean;
 }
 
-const TagBadge = ({ tag, className = "", onClick, selected = false }: TagBadgeProps) => {
-  // Map the tag to a valid variant
-  let variantKey: "general" | "coding" | "writing" | "creative" | "learning" | "custom" | "all" = "custom";
-  
-  // Check if tag is one of our predefined types
-  if (
-    tag === "general" || 
-    tag === "coding" || 
-    tag === "writing" || 
-    tag === "creative" || 
-    tag === "learning" || 
-    tag === "custom" || 
-    tag === "all"
-  ) {
-    variantKey = tag as any;
+const tagConfig: Record<string, { color: string; icon: React.ReactNode }> = {
+  general: { 
+    color: "bg-slate-200 hover:bg-slate-300 text-slate-900", 
+    icon: <Hash className="h-3 w-3 mr-1" /> 
+  },
+  coding: { 
+    color: "bg-blue-100 hover:bg-blue-200 text-blue-900", 
+    icon: <Code className="h-3 w-3 mr-1" /> 
+  },
+  writing: { 
+    color: "bg-emerald-100 hover:bg-emerald-200 text-emerald-900", 
+    icon: <PenTool className="h-3 w-3 mr-1" /> 
+  },
+  creative: { 
+    color: "bg-purple-100 hover:bg-purple-200 text-purple-900", 
+    icon: <Brain className="h-3 w-3 mr-1" /> 
+  },
+  learning: { 
+    color: "bg-amber-100 hover:bg-amber-200 text-amber-900", 
+    icon: <BookOpen className="h-3 w-3 mr-1" /> 
+  },
+  custom: { 
+    color: "bg-rose-100 hover:bg-rose-200 text-rose-900", 
+    icon: <Zap className="h-3 w-3 mr-1" /> 
   }
+};
 
-  // Set additional classes if tag is selected
-  const selectedClass = selected ? "ring-2 ring-offset-1" : "";
-
+const TagBadge: React.FC<TagBadgeProps> = ({ tag, className, onClick }) => {
+  const config = tagConfig[tag] || tagConfig.general;
+  
   return (
     <Badge 
-      variant="outline" 
-      className={`${tagVariants({ variant: variantKey })} ${selectedClass} transition-all cursor-pointer ${className}`}
+      className={`flex items-center ${config.color} ${onClick ? 'cursor-pointer' : ''} ${className || ''}`} 
+      variant="outline"
       onClick={onClick}
     >
-      {tag}
+      {config.icon}
+      <span className="capitalize">{tag}</span>
     </Badge>
   );
 };

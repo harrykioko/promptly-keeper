@@ -4,17 +4,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Upload, Loader2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { User as SupabaseUser } from '@supabase/supabase-js';
-import { Profile } from '@/types/database';
+import { supabase } from '@/integrations/supabase/client';
+import { User } from '@supabase/supabase-js';
+import { Profile } from '@/hooks/useProfileForm';
 import { useFileUpload } from '@/hooks/useFileUpload';
 
 interface AvatarUploadProps {
-  user: SupabaseUser;
+  user: User;
   profile: Profile;
-  setProfile: (profile: Profile | ((prev: Profile) => Profile)) => void;
+  setProfile: React.Dispatch<React.SetStateAction<Profile>>;
   uploading: boolean;
-  setUploading: (uploading: boolean | ((prev: boolean) => boolean)) => void;
+  setUploading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AvatarUpload = ({ user, profile, setProfile, uploading, setUploading }: AvatarUploadProps) => {

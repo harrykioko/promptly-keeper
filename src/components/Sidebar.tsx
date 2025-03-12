@@ -1,6 +1,6 @@
 
-import * as React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Search,
@@ -18,20 +18,18 @@ import { useAuth } from './AuthProvider';
 import { cn } from '@/lib/utils';
 
 interface NavItemProps {
-  icon: React.FunctionComponent<React.SVGAttributes<SVGSVGElement>>;
+  icon: React.ElementType;
   label: string;
   onClick?: () => void;
   isCollapsed: boolean;
-  isActive?: boolean;
 }
 
-const NavItem = ({ icon: Icon, label, onClick, isCollapsed, isActive }: NavItemProps) => (
+const NavItem = ({ icon: Icon, label, onClick, isCollapsed }: NavItemProps) => (
   <Button
     variant="ghost"
     className={cn(
       "w-full justify-start gap-2",
-      isCollapsed ? "justify-center px-2" : "px-3",
-      isActive && "bg-accent text-accent-foreground"
+      isCollapsed ? "justify-center px-2" : "px-3"
     )}
     onClick={onClick}
   >
@@ -44,11 +42,6 @@ export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const { signOut } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const isActivePath = (path: string) => {
-    return location.pathname === path;
-  };
 
   return (
     <div className="relative">
@@ -89,35 +82,30 @@ export function Sidebar() {
               label="Prompts"
               onClick={() => navigate('/')}
               isCollapsed={isCollapsed}
-              isActive={isActivePath('/')}
             />
             <NavItem
               icon={LayoutTemplate}
               label="Templates"
               onClick={() => navigate('/templates')}
               isCollapsed={isCollapsed}
-              isActive={isActivePath('/templates')}
             />
             <NavItem
               icon={Files}
               label="Documents"
               onClick={() => navigate('/documents')}
               isCollapsed={isCollapsed}
-              isActive={isActivePath('/documents')}
             />
             <NavItem
               icon={Wand2}
               label="AI Tools"
               onClick={() => navigate('/ai-tools')}
               isCollapsed={isCollapsed}
-              isActive={isActivePath('/ai-tools')}
             />
             <NavItem
               icon={UserRound}
               label="Profile"
               onClick={() => navigate('/profile')}
               isCollapsed={isCollapsed}
-              isActive={isActivePath('/profile')}
             />
           </nav>
 
