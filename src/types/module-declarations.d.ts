@@ -14,6 +14,10 @@ declare module 'react' {
 }
 
 declare module '@tanstack/react-query' {
+  export class QueryClient {
+    constructor(config?: any);
+  }
+  export function QueryClientProvider(props: any): any;
   export function useQuery(options: any): any;
   export function useMutation(options: any): any;
   export function useQueryClient(): any;
