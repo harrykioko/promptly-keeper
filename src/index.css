@@ -112,3 +112,20 @@
   content: '';
   @apply absolute top-0 left-1/4 w-96 h-96 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-subtle -z-10;
 }
+
+/* Badge styles */
+.badge {
+  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors;
+}
+
+.badge-default {
+  @apply bg-primary text-primary-foreground hover:bg-primary/80;
+}
+
+.badge-secondary {
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+}
+
+.badge-outline {
+  @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
+}
