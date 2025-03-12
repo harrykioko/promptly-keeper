@@ -1,10 +1,10 @@
+
 import React, { useState } from 'react';
-import { GlassCard } from './GlassCard';
-import { GlassButton } from './GlassButton';
-import { Transition } from '../animation/Transition';
 import { TagType } from '../TagBadge';
 import TagBadge from '../TagBadge';
 import { cn } from '@/lib/utils';
+import { GlassButton } from './GlassButton';
+import { Transition } from '../animation/Transition';
 
 interface GlassPromptCardProps {
   id: string;
@@ -59,9 +59,9 @@ export const GlassPromptCard = ({
   };
   
   return (
-    <GlassCard
+    <div 
       className={cn(
-        'cursor-pointer transform transition-all duration-300',
+        'glass-prompt-card cursor-pointer transform transition-all duration-300',
         isHovered ? 'scale-[1.02] shadow-xl' : 'scale-100',
         className
       )}
@@ -69,7 +69,7 @@ export const GlassPromptCard = ({
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
     >
-      <div className="relative">
+      <div className="relative p-6">
         {/* Header */}
         <div className="flex justify-between items-start mb-3">
           <h3 className="text-xl font-semibold text-neutral-800">
@@ -128,6 +128,6 @@ export const GlassPromptCard = ({
           </div>
         </Transition>
       </div>
-    </GlassCard>
+    </div>
   );
 }; 

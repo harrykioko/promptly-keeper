@@ -26,7 +26,7 @@ const PromptCard = ({
 }: PromptCardProps) => {
   const { toast } = useToast();
 
-  const copyToClipboard = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const copyToClipboard = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation(); // Prevent opening the dialog when clicking the copy button
     await navigator.clipboard.writeText(content);
     toast({

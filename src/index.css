@@ -86,7 +86,13 @@
 }
 
 .glass-prompt-card {
-  @apply glass-card transition-all duration-300 hover:shadow-lg transform hover:scale-[1.02];
+  @apply transition-all duration-300 hover:shadow-lg transform hover:scale-[1.02];
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 1rem;
 }
 
 .fade-in {
@@ -105,12 +111,16 @@
 
 .glass-bg::before {
   content: '';
-  @apply absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-neutral-50 -z-10;
+  @apply absolute inset-0 bg-gradient-to-br from-[#e0eafc] to-[#cfdef3] -z-10;
 }
 
-.glass-bg::after {
-  content: '';
-  @apply absolute top-0 left-1/4 w-96 h-96 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-subtle -z-10;
+/* Glass styling for UI elements */
+.glass-ui {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Badge styles */

@@ -24,7 +24,7 @@ const Badge = ({
   );
 };
 
-export type TagType = 'general' | 'coding' | 'writing' | 'creative' | 'learning' | 'custom' | string;
+export type TagType = 'general' | 'coding' | 'writing' | 'creative' | 'learning' | 'custom' | 'all' | string;
 
 export interface TagBadgeProps {
   tag: TagType;

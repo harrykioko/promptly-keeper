@@ -26,11 +26,11 @@ interface PromptDetailDialogProps {
   } | null;
 }
 
-const PromptDetailDialog: React.FC<PromptDetailDialogProps> = ({ 
+const PromptDetailDialog = ({ 
   open, 
   onOpenChange, 
   prompt 
-}) => {
+}: PromptDetailDialogProps) => {
   const { toast } = useToast();
 
   const copyToClipboard = async () => {

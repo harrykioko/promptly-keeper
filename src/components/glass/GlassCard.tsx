@@ -15,15 +15,15 @@ export const GlassCard = ({
   ...props
 }: GlassCardProps) => {
   const intensityClasses = {
-    light: 'bg-white/40 backdrop-blur-sm',
-    medium: 'glass-card',
-    heavy: 'bg-white/80 backdrop-blur-xl',
+    light: 'bg-white/10 backdrop-blur-sm',
+    medium: 'bg-white/15 backdrop-blur-md border border-white/30',
+    heavy: 'bg-white/25 backdrop-blur-xl',
   }[intensity];
   
   return (
     <div 
       className={cn(
-        'transition-all duration-300 hover:shadow-lg',
+        'transition-all duration-300 rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:shadow-lg',
         intensityClasses,
         className
       )}
